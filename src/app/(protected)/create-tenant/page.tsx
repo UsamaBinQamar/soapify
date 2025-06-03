@@ -69,20 +69,34 @@ export default function CreateTenantPage() {
     if (error) {
       setMessage(error.message);
     } else {
-      setMessage("Tenant created successfully!");
-      setForm({
-        name: "",
-        type: "",
-        email: "",
-        contact: "",
-        address: "",
-        role: "",
-        assigned_facility: "",
-        credentials: "",
-        specialty: "",
-        license_number: "",
-        license_state: "",
+      // Send invite
+      const inviteRes = await fetch("/api/invite-tenant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email }),
       });
+      const inviteData = await inviteRes.json();
+
+      if (inviteData.error) {
+        setMessage(
+          "Tenant created, but failed to send invite: " + inviteData.error
+        );
+      } else {
+        setMessage("Tenant created and invite sent!");
+        setForm({
+          name: "",
+          type: "",
+          email: "",
+          contact: "",
+          address: "",
+          role: "",
+          assigned_facility: "",
+          credentials: "",
+          specialty: "",
+          license_number: "",
+          license_state: "",
+        });
+      }
     }
     setLoading(false);
   };
@@ -205,7 +219,18 @@ export default function CreateTenantPage() {
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Creating..." : "Create Tenant"}
         </Button>
-      </form>
+      </form>{" "}
+      <Button
+        onClick={() => {
+          fetch("/api/invite-tenant", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: "usamadevio@gmail.com" }),
+          });
+        }}
+      >
+        Invite
+      </Button>
     </div>
   );
 }
