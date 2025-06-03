@@ -2,14 +2,12 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-
+import { createClient } from "@/lib/supabase/client";
 const FACILITY_TYPES = ["Hospital", "Clinic", "Individual"];
 const ROLES = ["Doctor", "Admin"];
 
 export default function CreateTenantPage() {
-  const supabase = createClientComponentClient();
-
+  const supabase = createClient();
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -42,7 +40,10 @@ export default function CreateTenantPage() {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
+    console.log(user);
     if (userError || !user) {
+      console.log(userError);
+      console.log(user);
       setMessage("You must be logged in as admin.");
       setLoading(false);
       return;
